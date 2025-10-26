@@ -28,10 +28,10 @@ jobs:
           # give the server a moment to start
           sleep 3
 
-      - name: Health check
+      - name: Run tests
         run: |
-          echo "Checking /health"
-          curl -sSf http://localhost:5000/health
+          echo "Running npm test (health smoke)"
+          npm test
 
       - name: Stop background server
         if: always()
