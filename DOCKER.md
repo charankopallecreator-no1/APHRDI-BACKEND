@@ -25,3 +25,9 @@ Notes
 - Keep your `.env` out of version control. For production, use your cloud provider's secrets manager.
 - `docker-compose.yml` now includes a `restart: unless-stopped` policy for the `api` service.
 - If you change server code, re-run `docker-compose up --build -d` to rebuild the image.
+ 
+Additional runtime variables for observability
+- `SENTRY_DSN` (optional): set this to your Sentry DSN to enable error tracking. If not set, Sentry remains inactive.
+
+Metrics
+- The app exposes Prometheus-compatible metrics at `/metrics` (provided by `express-prom-bundle`). You can configure Prometheus to scrape `http://<host>:5000/metrics`.
