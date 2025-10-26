@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start server in background
+        run: |
+          node server.js &
+          # give the server a moment to start
+          sleep 3
+
+      - name: Health check
+        run: |
+          echo "Checking /health"
+          curl -sSf http://localhost:5000/health
+
+      - name: Stop background server
+        if: always()
+        run: |
+          pkill -f node || true

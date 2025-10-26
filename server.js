@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
+const mongoose = require('mongoose');
 
 // Load env vars
 dotenv.config();
@@ -62,7 +63,45 @@ const PORT = process.env.PORT || 5000;
 // Simple root route to confirm server is running (helps avoid 404 on '/')
 // Health endpoint
 app.get('/', (req, res) => res.json({ success: true, message: 'APHRDI API is running' }));
-app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+app.get('/health', async (req, res) => {
+  const uptime = process.uptime();
+
+  // Map mongoose connection states to human readable values
+  const mapState = (s) => {
+    switch (s) {
+      case 0: return 'disconnected';
+      case 1: return 'connected';
+      case 2: return 'connecting';
+      case 3: return 'disconnecting';
+      default: return 'unknown';
+    }
+  };
+
+  const dbState = mongoose.connection ? mongoose.connection.readyState : 0;
+  let dbPing = null;
+
+  if (dbState === 1) {
+    try {
+      // Attempt a lightweight ping to the DB admin command (works with MongoDB)
+      if (mongoose.connection.db && mongoose.connection.db.admin) {
+        // eslint-disable-next-line no-unused-vars
+        const ping = await mongoose.connection.db.admin().ping();
+        dbPing = 'ok';
+      }
+    } catch (err) {
+      dbPing = 'error';
+    }
+  }
+
+  res.json({
+    status: 'ok',
+    uptime,
+    db: {
+      state: mapState(dbState),
+      ping: dbPing,
+    },
+  });
+});
 
 // Start server and keep reference so it can be closed on errors
 const server = app.listen(PORT, () => {
