@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: aphrdi-backend
+    env: docker
+    region: singapore  # Choose your preferred region
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false  # Marks this as a secret to be set in Render dashboard
+      - key: JWT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: LOG_LEVEL
+        value: info
+      - key: CORS_ORIGINS
+        sync: false  # Set this in dashboard based on your frontend URL
+    healthCheckPath: /health
+    numInstances: 1
+    autoDeploy: true
