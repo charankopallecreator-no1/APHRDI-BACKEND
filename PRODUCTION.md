@@ -2,6 +2,46 @@
 
 This document outlines the recommended production configuration for the APHRDI backend.
 
+## Deployment on Render
+
+1. Prerequisites
+   - A GitHub account with this repository
+   - A Render account (sign up at https://render.com)
+   - MongoDB Atlas cluster (for production database)
+   - OpenAI API key
+
+2. Deployment Steps
+   1. Go to [Render Dashboard](https://dashboard.render.com)
+   2. Click "New +" and select "Web Service"
+   3. Connect your GitHub repository
+   4. Render will automatically detect the `render.yaml` configuration
+   5. Configure the following environment variables:
+      - `MONGO_URI`: Your production MongoDB connection string
+      - `JWT_SECRET`: A secure random string (min 64 chars)
+      - `OPENAI_API_KEY`: Your OpenAI API key
+      - `SENTRY_DSN` (Optional): Your Sentry project DSN
+      - `CORS_ORIGINS`: Your frontend application URL
+
+3. Post-Deployment
+   - Render will automatically:
+     - Build the Docker image
+     - Deploy the container
+     - Set up HTTPS
+     - Configure health checks
+     - Enable auto-deployment for future pushes
+   - Verify the deployment by checking:
+     - Health endpoint (`/health`)
+     - API endpoints
+     - Logs in Render dashboard
+     - Environment variables
+
+4. Maintenance on Render
+   - Monitor the service in Render dashboard
+   - Check deployment logs
+   - Set up notifications for failed deployments
+   - Configure auto-scaling if needed
+   - Set up custom domains
+
 ## Environment Variables for Production
 
 ```env
